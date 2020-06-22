@@ -1,0 +1,47 @@
+---
+title: "Working with Slovak census data and geographic shapefiles"
+author: "Tomas Okal"
+date: "6/22/2020"
+output: github_document
+---
+
+```{r, include = FALSE}
+
+library(openxlsx)
+library(sf)
+library(data.table)
+library(ggplot2)
+library(ggmap)
+
+```
+
+```{r}
+
+excel_file <- openxlsx::read.xlsx("Data//Aggregated data on population.xlsx")
+dt_obj <- data.table::data.table(excel_file)
+
+```
+
+```{r}
+
+shapefile <- sf::st_read("Data//Slovakia_Census_2011//Grid_ETRS89_LAEA_SK_1k.shp")
+shapefile_dt <- data.table::data.table(population_layer)
+
+census_shapefile <- merge(shapefile_dt, dt_obj)
+
+```
+
+```{r}
+
+ggplot2::ggplot(data = census_shapefile, aes(geometry = geometry)) +
+  ggplot2::geom_sf(aes(fill = TOT_P), color = NA) +
+  ggplot2::scale_fill_viridis_c(option = "inferno", trans = "log") +
+  labs(title = "Population of Slovakia"
+       , subtitle = "2011 Census Data"
+       , fill = "Population") +
+  theme_void()
+
+```
+
+
+
